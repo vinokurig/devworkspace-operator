@@ -61,6 +61,9 @@ type RoutingConfig struct {
 	// DevWorkspaces. However, changing the proxy configuration for the DevWorkspace Operator itself
 	// requires restarting the controller deployment.
 	ProxyConfig *Proxy `json:"proxyConfig,omitempty"`
+	// TLSCertificateConfigmapRef defines the name and namespace of the configmap with a certificate to inject to http
+	// client.
+	TLSCertificateConfigmapRef *ConfigmapReference `json:"tlsCertificateConfigmapRef,omitempty"`
 }
 
 type WorkspaceConfig struct {
@@ -238,6 +241,11 @@ type ProjectCloneConfig struct {
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 	// Env allows defining additional environment variables for the project clone container.
 	Env []corev1.EnvVar `json:"env,omitempty"`
+}
+
+type ConfigmapReference struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
 }
 
 // DevWorkspaceOperatorConfig is the Schema for the devworkspaceoperatorconfigs API

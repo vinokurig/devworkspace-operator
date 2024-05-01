@@ -138,7 +138,7 @@ var _ = BeforeSuite(func() {
 		NonCachingClient: nonCachingClient,
 		Log:              ctrl.Log.WithName("controllers").WithName("DevWorkspace"),
 		Scheme:           mgr.GetScheme(),
-	}).SetupWithManager(mgr)
+	}).SetupWithManager(mgr, nonCachingClient)
 	Expect(err).NotTo(HaveOccurred())
 
 	// Set HTTP client to fail all requests by default; tests that require HTTP must set this up directly

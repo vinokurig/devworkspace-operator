@@ -17,6 +17,7 @@ package controllers
 
 import (
 	dw "github.com/devfile/api/v2/pkg/apis/workspaces/v1alpha2"
+	"github.com/devfile/devworkspace-operator/pkg/config"
 	"github.com/devfile/devworkspace-operator/pkg/constants"
 
 	corev1 "k8s.io/api/core/v1"
@@ -99,6 +100,19 @@ var automountPredicates = predicate.Funcs{
 	GenericFunc: func(_ event.GenericEvent) bool { return false },
 }
 
+var certificatePredicates = predicate.Funcs{
+	CreateFunc: func(ev event.CreateEvent) bool {
+		return objectIsCertificateConfigmap(ev.Object)
+	},
+	DeleteFunc: func(ev event.DeleteEvent) bool {
+		return objectIsCertificateConfigmap(ev.Object)
+	},
+	UpdateFunc: func(ev event.UpdateEvent) bool {
+		return objectIsCertificateConfigmap(ev.ObjectNew)
+	},
+	GenericFunc: func(_ event.GenericEvent) bool { return false },
+}
+
 func objectIsAutomountResource(obj client.Object) bool {
 	labels := obj.GetLabels()
 	switch {
@@ -111,4 +125,13 @@ func objectIsAutomountResource(obj client.Object) bool {
 		return false
 	}
 
+}
+
+func objectIsCertificateConfigmap(obj client.Object) bool {
+	configmapRef := config.GetGlobalConfig().Routing.TLSCertificateConfigmapRef
+	if configmapRef == nil {
+		return false
+	} else {
+		return configmapRef.Name == obj.GetName() && configmapRef.Namespace == obj.GetNamespace()
+	}
 }

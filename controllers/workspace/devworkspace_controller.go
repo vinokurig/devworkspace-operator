@@ -667,9 +667,8 @@ func (r *DevWorkspaceReconciler) getWorkspaceId(ctx context.Context, workspace *
 	}
 }
 
-func (r *DevWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	setupHttpClients()
-
+func (r *DevWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager, k8s client.Client) error {
+	setupHttpClients(k8s)
 	maxConcurrentReconciles, err := wkspConfig.GetMaxConcurrentReconciles()
 	if err != nil {
 		return err
@@ -681,6 +680,7 @@ func (r *DevWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 	configWatcher := builder.WithPredicates(wkspConfig.Predicates())
 	automountWatcher := builder.WithPredicates(automountPredicates)
+	certificateWatcher := builder.WithPredicates(certificatePredicates)
 
 	// TODO: Set up indexing https://book.kubebuilder.io/cronjob-tutorial/controller-implementation.html#setup
 	return ctrl.NewControllerManagedBy(mgr).
@@ -700,6 +700,7 @@ func (r *DevWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(&source.Kind{Type: &corev1.PersistentVolumeClaim{}}, handler.EnqueueRequestsFromMapFunc(r.dwPVCHandler)).
 		Watches(&source.Kind{Type: &corev1.Secret{}}, handler.EnqueueRequestsFromMapFunc(r.runningWorkspacesHandler), automountWatcher).
 		Watches(&source.Kind{Type: &corev1.ConfigMap{}}, handler.EnqueueRequestsFromMapFunc(r.runningWorkspacesHandler), automountWatcher).
+		Watches(&source.Kind{Type: &corev1.ConfigMap{}}, handler.EnqueueRequestsFromMapFunc(r.certificateHandler), certificateWatcher).
 		Watches(&source.Kind{Type: &corev1.PersistentVolumeClaim{}}, handler.EnqueueRequestsFromMapFunc(r.runningWorkspacesHandler), automountWatcher).
 		Watches(&source.Kind{Type: &controllerv1alpha1.DevWorkspaceOperatorConfig{}}, handler.EnqueueRequestsFromMapFunc(emptyMapper), configWatcher).
 		WithEventFilter(devworkspacePredicates).

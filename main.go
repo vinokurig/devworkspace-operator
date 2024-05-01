@@ -165,7 +165,7 @@ func main() {
 		NonCachingClient: nonCachingClient,
 		Log:              ctrl.Log.WithName("controllers").WithName("DevWorkspace"),
 		Scheme:           mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(mgr, nonCachingClient); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DevWorkspace")
 		os.Exit(1)
 	}

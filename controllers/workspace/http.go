@@ -14,9 +14,14 @@
 package controllers
 
 import (
+	"context"
 	"crypto/tls"
+	"crypto/x509"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"net/http"
 	"net/url"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"time"
 
 	"github.com/devfile/devworkspace-operator/pkg/config"
@@ -28,8 +33,12 @@ var (
 	healthCheckHttpClient *http.Client
 )
 
-func setupHttpClients() {
+func setupHttpClients(k8s client.Client) {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
+	certs, ok := readCertificates(k8s)
+	if ok {
+		injectCertificates(certs, transport)
+	}
 	healthCheckTransport := http.DefaultTransport.(*http.Transport).Clone()
 	healthCheckTransport.TLSClientConfig = &tls.Config{
 		InsecureSkipVerify: true,
@@ -62,5 +71,33 @@ func setupHttpClients() {
 	healthCheckHttpClient = &http.Client{
 		Transport: healthCheckTransport,
 		Timeout:   500 * time.Millisecond,
+	}
+}
+
+func readCertificates(k8s client.Client) ([]byte, bool) {
+	configmapRef := config.GetGlobalConfig().Routing.TLSCertificateConfigmapRef
+	if configmapRef == nil {
+		return nil, false
+	}
+	configMap := &corev1.ConfigMap{}
+	namespacedName := &types.NamespacedName{
+		Name:      configmapRef.Name,
+		Namespace: configmapRef.Namespace,
+	}
+	err := k8s.Get(context.Background(), *namespacedName, configMap)
+	if err == nil {
+		certificates, ok := configMap.Data["custom-ca-certificates.pem"]
+		if ok {
+			return []byte(certificates), true
+		}
+	}
+	return []byte{}, false
+}
+
+func injectCertificates(certsPem []byte, transport *http.Transport) {
+	caCertPool := x509.NewCertPool()
+	ok := caCertPool.AppendCertsFromPEM(certsPem)
+	if ok {
+		transport.TLSClientConfig = &tls.Config{RootCAs: caCertPool}
 	}
 }

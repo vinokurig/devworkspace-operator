@@ -15,6 +15,8 @@ package controllers
 
 import (
 	"context"
+	corev1 "k8s.io/api/core/v1"
+	"net/http"
 
 	dw "github.com/devfile/api/v2/pkg/apis/workspaces/v1alpha2"
 	wkspConfig "github.com/devfile/devworkspace-operator/pkg/config"
@@ -105,4 +107,12 @@ func (r *DevWorkspaceReconciler) runningWorkspacesHandler(obj client.Object) []r
 		}
 	}
 	return reconciles
+}
+
+func (r *DevWorkspaceReconciler) certificateHandler(obj client.Object) []reconcile.Request {
+	certsPem, ok := obj.(*corev1.ConfigMap).Data["custom-ca-certificates.pem"]
+	if ok {
+		injectCertificates([]byte(certsPem), httpClient.Transport.(*http.Transport))
+	}
+	return []reconcile.Request{}
 }
