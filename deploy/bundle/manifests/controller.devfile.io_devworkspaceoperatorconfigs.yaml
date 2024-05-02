@@ -59,11 +59,12 @@ spec:
                     description: TLSCertificateConfigmapRef defines the name and namespace of the configmap with a certificate to inject to http client.
                     properties:
                       name:
-                        description: Name of the configmap with a certificate to inject to http client.
                         type: string
                       namespace:
-                        description: Namespace of the configmap with a certificate to inject to http client.
                         type: string
+                    required:
+                    - name
+                    - namespace
                     type: object
                 type: object
               workspace:

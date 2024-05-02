@@ -90,6 +90,18 @@ spec:
                           to an empty string ("")
                         type: string
                     type: object
+                  tlsCertificateConfigmapRef:
+                    description: TLSCertificateConfigmapRef defines the name and namespace
+                      of the configmap with a certificate to inject to http client.
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    required:
+                    - name
+                    - namespace
+                    type: object
                 type: object
               workspace:
                 description: Workspace defines configuration options related to how
