@@ -97,7 +97,7 @@ spec:
     url: https://devfile.io
   version: 0.28.0-dev
   relatedImages:
-    - image: quay.io/devfile/devworkspace-controller:next
+    - image: quay.io/ivinokur/devworkspace-controller:next
       name: devworkspace_webhook_server
     - image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
       name: kube_rbac_proxy

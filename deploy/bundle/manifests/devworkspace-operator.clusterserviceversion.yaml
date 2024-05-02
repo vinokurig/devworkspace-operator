@@ -338,7 +338,7 @@ spec:
                 - name: WEBHOOK_SECRET_NAME
                   value: devworkspace-webhookserver-tls
                 - name: RELATED_IMAGE_devworkspace_webhook_server
-                  value: quay.io/devfile/devworkspace-controller:next
+                  value: quay.io/ivinokur/devworkspace-controller:next
                 - name: RELATED_IMAGE_kube_rbac_proxy
                   value: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
                 - name: RELATED_IMAGE_project_clone
@@ -373,7 +373,7 @@ spec:
                   value: quay.io/eclipse/che-workspace-data-sync-storage:0.0.1
                 - name: RELATED_IMAGE_async_storage_sidecar
                   value: quay.io/eclipse/che-sidecar-workspace-data-sync:0.0.1
-                image: quay.io/devfile/devworkspace-controller:next
+                image: quay.io/ivinokur/devworkspace-controller:next
                 imagePullPolicy: Always
                 livenessProbe:
                   failureThreshold: 5
@@ -479,7 +479,7 @@ spec:
     name: Devfile
     url: https://devfile.io
   relatedImages:
-  - image: quay.io/devfile/devworkspace-controller:next
+  - image: quay.io/ivinokur/devworkspace-controller:next
     name: devworkspace_webhook_server
   - image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
     name: kube_rbac_proxy
