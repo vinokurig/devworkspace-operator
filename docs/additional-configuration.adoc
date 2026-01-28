@@ -202,6 +202,8 @@ cat <<EOF > /tmp/ssh_config
 host *
   IdentityFile /etc/ssh/dwo_ssh_key
   StrictHostKeyChecking = no
+
+Include /etc/ssh/ssh_config.d/*.conf
 EOF
 ----
 
